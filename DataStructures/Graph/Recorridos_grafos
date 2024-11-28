@@ -1,0 +1,167 @@
+# DFS
+
+def dfs(graph, start):
+    visitado = set()
+    pila = [start]
+    resultado = []
+
+    while pila:
+        node = pila.pop()
+        if node not in visitado:
+            visitado.add(node)
+            resultado.append(node)
+            # Agregamos los vecinos del nodo actual en la pila
+            for vecino in reversed(graph[node]):
+                if vecino not in visitado:
+                    pila.append(vecino)
+    return resultado
+
+# BFS
+
+def bfs(graph, start):
+    visitado = set()
+    cola = [start]
+    resultado = []
+
+    while cola:
+        node = cola.pop(0)
+        if node not in visitado:
+            visitado.add(node)
+            resultado.append(node)
+            # Agregamos los vecinos no visitados al final de la cola
+            for vecino in graph[node]:
+                if vecino not in visitado:
+                    cola.append(vecino)
+    return resultado
+
+# DFO
+
+def dfo(graph, start):
+    visitado = set()
+    pila = []
+
+    def dfs(node):
+        if node not in visitado:
+            visitado.add(node)
+            for vecino in graph[node]:
+                if vecino not in visitado:
+                    dfs(vecino)
+            pila.append(node)
+
+    dfs(start)
+    return pila[::-1]
+
+# PRIM LAZY
+
+def prim_lazy(graph, start):
+    visitado = set()
+    edges = []
+    mst = []
+    coste_total = 0
+
+    # Función para agregar los bordes de un nodo a la cola
+    def add_edges(node):
+        for vecino, peso in graph[node]:
+            if vecino not in visitado:
+                edges.append((peso, node, vecino))  # (peso, nodo_origen, nodo_destino)
+
+    # Se inicia desde el nodo inicial
+    visitado.add(start)
+    add_edges(start)
+
+    while edges:
+        # Encontramos el borde de menor peso (simulando min-heap)
+        edges.sort()
+        weight, u, v = edges.pop(0)  # Extraemos el borde más ligero
+
+        # Si ya está visitado lo ignoramos
+        if v in visitado:
+            continue
+
+        # Añadimos el borde al MST
+        mst.append((u, v, weight))
+        coste_total += weight
+
+        # Marcamos el nodo destino como visitado y agregamos sus bordes
+        visitado.add(v)
+        add_edges(v)
+
+    return mst, coste_total
+
+# PRIM EAGER
+
+def prim_eager(graph, start):
+    visitado = set()
+    coste_minimo = {}
+    edge_to = {}
+    mst = []
+    coste_total = 0
+
+    # Inicializamos el costo mínimo de cada nodo como infinito
+    for node in graph:
+        coste_minimo[node] = float('inf')
+    coste_minimo[start] = 0
+
+    while len(visitado) < len(graph):
+        # Encontramos el nodo no visitado con el menor costo
+        current = None
+        for node in graph:
+            if node not in visitado and (current is None or coste_minimo[node] < coste_minimo[current]):
+                current = node
+
+        visitado.add(current)
+
+        # Si el nodo tiene un borde asociado (no es el inicio), lo añadimos al MST
+        if current in edge_to:
+            mst.append((edge_to[current][0], current, coste_minimo[current]))
+            coste_total += coste_minimo[current]
+
+        # Actualizamos los costos mínimos para los vecinos del nodo actual
+        for neighbor, weight in graph[current]:
+            if neighbor not in visitado and weight < coste_minimo[neighbor]:
+                coste_minimo[neighbor] = weight
+                edge_to[neighbor] = (current, weight)
+
+    return mst, coste_total
+
+# DIJKSTRA
+
+def dijkstra(graph, start):
+    distancias_mas_cortas = {node: float('inf') for node in graph}
+    distancias_mas_cortas[start] = 0
+    visitados = set()
+    nodos_previos = {}
+
+    while len(visitados) < len(graph):
+        # Seleccionar el nodo no visitado con la distancia más corta
+        nodo_actual = None
+        for node in graph:
+            if node not in visitados:
+                if nodo_actual is None or distancias_mas_cortas[node] < distancias_mas_cortas[nodo_actual]:
+                    nodo_actual = node
+
+        if nodo_actual is None:
+            break  # Si no hay más nodos alcanzables terminamos
+
+        # Marcamos el nodo como visitado
+        visitados.add(nodo_actual)
+
+        # Actualizamos las distancias de los vecinos del nodo actual
+        for vecino, peso in graph[nodo_actual]:
+            if vecino not in visitados:
+                nueva_distancia = distancias_mas_cortas[nodo_actual] + peso
+                if nueva_distancia < distancias_mas_cortas[vecino]:
+                    distancias_mas_cortas[vecino] = nueva_distancia
+                    nodos_previos[vecino] = nodo_actual
+
+    return distancias_mas_cortas, nodos_previos
+
+# Función para reconstruir la ruta más corta a un nodo objetivo
+def reconstruct_path(nodos_previos, objetivo):
+    camino = []
+    nodo_actual = objetivo
+    while nodo_actual in nodos_previos:
+        camino.insert(0, nodo_actual)
+        nodo_actual = nodos_previos[nodo_actual]
+    camino.insert(0, nodo_actual)
+    return camino
