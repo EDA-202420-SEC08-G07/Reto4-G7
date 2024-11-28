@@ -165,3 +165,44 @@ def reconstruct_path(nodos_previos, objetivo):
         nodo_actual = nodos_previos[nodo_actual]
     camino.insert(0, nodo_actual)
     return camino
+
+
+# SON IGUAlES?
+
+def grafos_iguales(graph1, graph2):
+    # Verificamos si tienen los mismos nodos (llaves)
+    if set(graph1.keys()) != set(graph2.keys()):
+        return False
+
+    # Creamos una funcion para ordenar una lista de aristas (por vecino y peso)
+    def sort_edges(edges):
+        return sorted(edges, key=edge_key)
+
+    # Creamos una funcion para extraer la clave de ordenación de cada arista
+    def edge_key(edge):
+        return edge[0], edge[1]
+
+    # Verificamos las aristas de cada nodo
+    for node in graph1:
+        edges1 = sort_edges(graph1[node])
+        edges2 = sort_edges(graph2[node])
+
+        if edges1 != edges2:
+            return False
+
+    return True
+
+# COPIADO DE UN GRAFO
+
+def copia_grafo(graph):
+    """
+    Realiza una copia profunda de un grafo.
+    :param graph: Grafo representado como un diccionario (nodo: [(vecino, peso)]).
+    :return: Una copia independiente del grafo.
+    """
+    # Creamos un nuevo diccionario y copiamos cada nodo y su lista de vecinos
+    grafo_copiado = {}
+    for node, edges in graph.items():
+        # Copiar cada lista de aristas (vecino, peso)
+        grafo_copiado[node] = [(vecino, peso) for vecino, peso in edges]
+    return grafo_copiado
