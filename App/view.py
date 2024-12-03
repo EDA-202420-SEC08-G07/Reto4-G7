@@ -118,10 +118,17 @@ def print_req_4(control):
 
 def print_req_5(control):
     """
-        Función que imprime la solución del Requerimiento 5 en consola
+    Función que imprime la solución del Requerimiento 5 en consola.
     """
-    # TODO: Imprimir el resultado del requerimiento 5
-    pass
+    usuario_a = input("Ingrese el ID del usuario: ")
+    n = int(input("Ingrese la cantidad de amigos que siguen a más usuarios (N): "))
+    amigos_ordenados = logic.req_5(control, usuario_a, n)
+    if amigos_ordenados:
+        print(f"\nLos {n} amigos que siguen a más usuarios en la red son:\n")
+        for amigo in amigos_ordenados:
+            print(f"ID: {amigo['id']}, Alias: {amigo['alias']}, Seguidos: {amigo['seguidos']}")
+    else:
+        print(f"No se encontraron amigos para el usuario con ID {usuario_a}.")
 
 
 def print_req_6(control):
