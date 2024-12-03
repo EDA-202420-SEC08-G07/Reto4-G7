@@ -175,15 +175,48 @@ def req_3(catalog):
     # TODO: Modificar el requerimiento 3
     pass
 
+def obtener_amigos(catalog, user_id):
+        """
+        Creamos una funcion para obtener los amigos de un usuario (A sigue a B y B sigue a A)
+        """
+        seguidos = []
+        lista_adyacentes = mp_lin.get(catalog["vertices"], user_id)
+        if lista_adyacentes:
+            for arista in lista_adyacentes["elements"]:
+                seguidos.append(arista["vertex"])
 
-def req_4(catalog):
+        amigos = []
+        for seguido in seguidos:
+            lista_adyacentes_seguido = mp_lin.get(catalog["vertices"], seguido)
+            if lista_adyacentes_seguido:
+                for arista in lista_adyacentes_seguido["elements"]:
+                    if arista["vertex"] == user_id:
+                        amigos.append(seguido)
+        return set(amigos)
+
+def req_4(catalog, user_id_a, user_id_b):
     """
-    Retorna el resultado del requerimiento 4
+    Dado dos usuarios A y B, se requiere el listado de amigos en común, 
+    es decir los amigos de A que también son amigos de B.
     """
-    # TODO: Modificar el requerimiento 4
-    pass
+    # Utilizamos un set para encontrar intercepciones 
+    amigos_a = obtener_amigos(catalog, user_id_a)
+    amigos_b = obtener_amigos(catalog, user_id_b)
+    interseccion = amigos_a.intersection(amigos_b)
 
+    # Guardamos la informacion de los seguidos en comun
+    amigos_comun = []
+    for usuario in interseccion:
+        usuario_data = mp_lin.get(catalog["datos_usuarios"], usuario)
+        if usuario_data:
+            id_usuario = usuario
+            alias = usuario_data.get("USER_NAME", "Desconocido")
+            tipo = usuario_data.get("USER_TYPE", "Desconocido")
+            amigos_comun.append((id_usuario, alias, tipo))
 
+    return amigos_comun if amigos_comun else None
+        
+    
 def req_5(catalog):
     """
     Retorna el resultado del requerimiento 5

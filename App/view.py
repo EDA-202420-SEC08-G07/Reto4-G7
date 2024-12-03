@@ -105,8 +105,15 @@ def print_req_4(control):
     """
         Función que imprime la solución del Requerimiento 4 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 4
-    pass
+    usuario_a = input("ingrese el id del usuario a: ")
+    usuario_b = input("ingrese el id del usuario b: ")
+    lista=logic.req_4(control, usuario_a, usuario_b)
+    if lista is not None:
+        print('La lista de los amigos en comun es de: ')
+        for id, alias, type_user in lista:
+            print(f"ID: {id}, Alias: {alias}, Tipo de Usuario: {type_user}")
+    else:
+        print(f"No se encontraron amigos en comun entre el usuario {usuario_a} y el usuario {usuario_b}.")
 
 
 def print_req_5(control):
