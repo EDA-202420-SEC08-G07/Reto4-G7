@@ -8,6 +8,8 @@ from DataStructures.Graph import edge as graph_edge
 from DataStructures.Map import map_entry as mp_entry
 from DataStructures.Map import map_functions as mp_fun
 from DataStructures.Map import map_linear_probing as mp_lin
+from DataStructures.List import array_list as lt
+from DataStructures.Graph import dfs as dfs
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 def new_logic():
@@ -56,6 +58,9 @@ def load_data(catalog, data_dir, filename, filename_relations):
         if graph.contains_vertex(catalog, follower_id) and graph.contains_vertex(catalog, followed_id):
             # Añadir la relación con el peso de fecha
             graph.add_edge(catalog, follower_id, followed_id, start_date)
+            usuario = graph.get_vertex_info(catalog, followed_id)
+            lst_adj = usuario['elements']
+            mp_lin.put(lst_adj, followed_id, followed_id)
     return catalog
 
 def report_data(catalog):
@@ -112,12 +117,26 @@ def get_data(catalog, id):
     pass
 
 
-def req_1(catalog):
+import time  # Importar para medir el tiempo
+
+def req_1(catalog, user_id_a, user_id_b): 
     """
-    Retorna el resultado del requerimiento 1
+    Retorna el resultado del requerimiento 1.
+    Incluye el tiempo de ejecución, cantidad de personas en el camino,
+    y detalles del camino con Id, alias y tipo de usuario.
     """
-    # TODO: Modificar el requerimiento 1
-    pass
+    respuesta = dfs.dfs_path(catalog, user_id_a, user_id_b)
+    if respuesta is not None:
+        cantidad_personas = len(respuesta) - 1  # No incluye el nodo inicial
+        lst_camino = []
+        for persona in respuesta:
+            usuario = graph.get_vertex_info(catalog, persona)
+            Id = persona
+            alias = usuario.get("USER_NAME", "Desconocido")
+            type_user = usuario.get("USER_TYPE", "Desconocido")
+            lst_camino.append((Id, alias, type_user))
+        return cantidad_personas, lst_camino
+    return None, None
 
 
 def req_2(catalog):
