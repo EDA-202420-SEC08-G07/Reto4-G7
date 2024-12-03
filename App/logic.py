@@ -10,6 +10,9 @@ from DataStructures.Map import map_functions as mp_fun
 from DataStructures.Map import map_linear_probing as mp_lin
 from DataStructures.List import array_list as lt
 from DataStructures.Graph import dfs as dfs
+from DataStructures.Graph import bfs as bfs
+
+sys.setrecursionlimit(10000)
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 def new_logic():
@@ -139,12 +142,24 @@ def req_1(catalog, user_id_a, user_id_b):
     return None, None
 
 
-def req_2(catalog):
+def req_2(catalog, user_id_a, user_id_b):
     """
-    Retorna el resultado del requerimiento 2
+    Dadas dos personas A y B de tipo “basic” se requiere obtener el camino de menor extensión para conectarlos.
     """
-    # TODO: Modificar el requerimiento 2
-    pass
+    camino= bfs.bfs_camino(catalog, user_id_a, user_id_b)
+    cantidad=0
+    if camino is not None:
+        lst_camino = []
+        for usuario in camino:
+            informacion=graph.get_vertex_info(catalog, usuario)
+            id=usuario
+            alias=informacion.get("USER_NAME", "Desconocido")
+            tipo_usuario = informacion.get("USER_TYPE", "Desconocido")
+            if tipo_usuario=="basic":
+                lst_camino.append((id, alias, tipo_usuario))
+                cantidad+=1
+        return cantidad, lst_camino
+    return None, None
 
 
 def req_3(catalog):
