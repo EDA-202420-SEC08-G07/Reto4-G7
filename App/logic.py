@@ -146,20 +146,26 @@ def req_2(catalog, user_id_a, user_id_b):
     """
     Dadas dos personas A y B de tipo “basic” se requiere obtener el camino de menor extensión para conectarlos.
     """
-    camino= bfs.bfs_camino(catalog, user_id_a, user_id_b)
-    cantidad=0
-    if camino is not None:
-        lst_camino = []
-        for usuario in camino:
-            informacion=graph.get_vertex_info(catalog, usuario)
-            id=usuario
-            alias=informacion.get("USER_NAME", "Desconocido")
-            tipo_usuario = informacion.get("USER_TYPE", "Desconocido")
-            if tipo_usuario=="basic":
+    info1=graph.get_vertex_info(catalog, user_id_a)
+    tipo1=info1.get("USER_TYPE", "Desconocido")
+    info2=graph.get_vertex_info(catalog, user_id_b)
+    tipo2=info2.get("USER_TYPE", "Desconocido")
+    
+    if tipo1=="basic" and tipo2=="basic":
+        camino= bfs.bfs_camino(catalog, user_id_a, user_id_b)
+        cantidad=0
+        if camino is not None:
+            lst_camino = []
+            for usuario in camino:
+                informacion=graph.get_vertex_info(catalog, usuario)
+                id=usuario
+                alias=informacion.get("USER_NAME", "Desconocido")
+                tipo_usuario = informacion.get("USER_TYPE", "Desconocido")
                 lst_camino.append((id, alias, tipo_usuario))
                 cantidad+=1
-        return cantidad, lst_camino
-    return None, None
+            return cantidad, lst_camino
+        return None, None
+    return ("PREMIUM"), ("PREMIUM")
 
 
 def req_3(catalog):

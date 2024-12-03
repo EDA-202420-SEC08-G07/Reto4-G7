@@ -59,14 +59,13 @@ def print_req_1(control):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 1
     usuario_a = input("ingrese el id del usuario a: ")
     usuario_b = input("ingrese el id del usuario b: ")
     total, camino = logic.req_1(control, usuario_a, usuario_b)
     if total is not None:
-        print(f'si hay un camino entre el usuario {usuario_a} y el usuario {usuario_b}')
-        print(f'el total de conexiones es de {total}')
-        print('el camino es: ')
+        print(f'Si hay un camino entre el usuario {usuario_a} y el usuario {usuario_b}')
+        print(f'El total de conexiones es de {total}')
+        print('El camino es: ')
         for Id, alias, type_user in camino:
             print(f"ID: {Id}, Alias: {alias}, Tipo de Usuario: {type_user}")
     else:
@@ -77,8 +76,21 @@ def print_req_2(control):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    usuario_a = input("ingrese el id del usuario a: ")
+    usuario_b = input("ingrese el id del usuario b: ")
+    total, camino = logic.req_2(control, usuario_a, usuario_b)
+    if total=="PREMIUM":
+        print("ERROR")
+        print(f'El usuario {usuario_a} es PREMIUM')
+        print(f'El usuario {usuario_b} es PREMIUM')
+    elif total is not None:
+        print(f'Si hay un camino entre el usuario {usuario_a} y el usuario {usuario_b}')
+        print(f'El total de conexiones es de {total}')
+        print('El camino es: ')
+        for id, alias, tipo_usuario in camino:
+            print(f"ID: {id}, Alias: {alias}, Tipo de Usuario: {tipo_usuario}")
+    else:
+        print(f"No se encontró un camino entre el usuario {usuario_a} y el usuario {usuario_b}.")
 
 
 def print_req_3(control):
