@@ -10,6 +10,9 @@ from DataStructures.Map import map_functions as mp_fun
 from DataStructures.Map import map_linear_probing as mp_lin
 from DataStructures.List import array_list as lt
 from DataStructures.Graph import dfs as dfs
+from DataStructures.Graph import bfs as bfs
+
+sys.setrecursionlimit(10000)
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 def new_logic():
@@ -139,12 +142,30 @@ def req_1(catalog, user_id_a, user_id_b):
     return None, None
 
 
-def req_2(catalog):
+def req_2(catalog, user_id_a, user_id_b):
     """
-    Retorna el resultado del requerimiento 2
+    Dadas dos personas A y B de tipo “basic” se requiere obtener el camino de menor extensión para conectarlos.
     """
-    # TODO: Modificar el requerimiento 2
-    pass
+    info1=graph.get_vertex_info(catalog, user_id_a)
+    tipo1=info1.get("USER_TYPE", "Desconocido")
+    info2=graph.get_vertex_info(catalog, user_id_b)
+    tipo2=info2.get("USER_TYPE", "Desconocido")
+    
+    if tipo1=="basic" and tipo2=="basic":
+        camino= bfs.bfs_camino(catalog, user_id_a, user_id_b)
+        cantidad=0
+        if camino is not None:
+            lst_camino = []
+            for usuario in camino:
+                informacion=graph.get_vertex_info(catalog, usuario)
+                id=usuario
+                alias=informacion.get("USER_NAME", "Desconocido")
+                tipo_usuario = informacion.get("USER_TYPE", "Desconocido")
+                lst_camino.append((id, alias, tipo_usuario))
+                cantidad+=1
+            return cantidad, lst_camino
+        return None, None
+    return ("PREMIUM"), ("PREMIUM")
 
 
 def req_3(catalog):
@@ -154,15 +175,50 @@ def req_3(catalog):
     # TODO: Modificar el requerimiento 3
     pass
 
+def obtener_amigos(catalog, user_id):
+        """
+        Creamos una funcion para obtener los amigos de un usuario (A sigue a B y B sigue a A)
+        """
+        seguidos = []
+        lista_adyacentes = mp_lin.get(catalog["vertices"], user_id)
+        if lista_adyacentes:
+            for arista in lista_adyacentes["elements"]:
+                seguidos.append(arista["vertex"])
 
-def req_4(catalog):
+        amigos = []
+        for seguido in seguidos:
+            lista_adyacentes_seguido = mp_lin.get(catalog["vertices"], seguido)
+            if lista_adyacentes_seguido:
+                for arista in lista_adyacentes_seguido["elements"]:
+                    if arista["vertex"] == user_id:
+                        amigos.append(seguido)
+        return amigos
+
+def req_4(catalog, user_id_a, user_id_b):
     """
-    Retorna el resultado del requerimiento 4
+    Dado dos usuarios A y B, se requiere el listado de amigos en común, 
+    es decir los amigos de A que también son amigos de B.
     """
-    # TODO: Modificar el requerimiento 4
-    pass
+    # Utilizamos un set para encontrar intercepciones 
+    amigos_a = obtener_amigos(catalog, user_id_a)
+    amigos_b = obtener_amigos(catalog, user_id_b)
+    set_a = set(amigos_a)
+    set_b = set(amigos_b)
+    interseccion = set_a.intersection(set_b)
 
+    # Guardamos la informacion de los seguidos en comun
+    amigos_comun = []
+    for usuario in interseccion:
+        usuario_data = mp_lin.get(catalog["datos_usuarios"], usuario)
+        if usuario_data:
+            id_usuario = usuario
+            alias = usuario_data.get("USER_NAME", "Desconocido")
+            tipo = usuario_data.get("USER_TYPE", "Desconocido")
+            amigos_comun.append((id_usuario, alias, tipo))
 
+    return amigos_comun if amigos_comun else None
+        
+    
 def req_5(catalog, Id, N):
     """
     Retorna los N amigos que siguen a más usuarios y que son amigos mutuos.
