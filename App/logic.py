@@ -192,7 +192,7 @@ def obtener_amigos(catalog, user_id):
                 for arista in lista_adyacentes_seguido["elements"]:
                     if arista["vertex"] == user_id:
                         amigos.append(seguido)
-        return set(amigos)
+        return amigos
 
 def req_4(catalog, user_id_a, user_id_b):
     """
@@ -202,7 +202,9 @@ def req_4(catalog, user_id_a, user_id_b):
     # Utilizamos un set para encontrar intercepciones 
     amigos_a = obtener_amigos(catalog, user_id_a)
     amigos_b = obtener_amigos(catalog, user_id_b)
-    interseccion = amigos_a.intersection(amigos_b)
+    set_a = set(amigos_a)
+    set_b = set(amigos_b)
+    interseccion = set_a.intersection(set_b)
 
     # Guardamos la informacion de los seguidos en comun
     amigos_comun = []
