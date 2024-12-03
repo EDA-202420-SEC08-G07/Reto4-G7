@@ -5,7 +5,7 @@ from DataStructures.List import array_list as lt
 from DataStructures.List import single_linked_list as sl
 
 
-def new_map(num_elements, load_factor, prime=109345121):
+def new_map(num_elements=19, load_factor=0.5, prime=109345121):
     """
     crea un nuevo mapa (sin elementos)
     Atributos:

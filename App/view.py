@@ -1,4 +1,11 @@
 import sys
+import App.logic as logic
+import time
+import csv
+import sys
+import os
+import json
+from tabulate import tabulate
 
 
 def new_logic():
@@ -6,7 +13,8 @@ def new_logic():
         Se crea una instancia del controlador
     """
     #TODO: Llamar la función de la lógica donde se crean las estructuras de datos
-    pass
+    control = logic.new_logic()
+    return control  
 
 def print_menu():
     print("Bienvenido")
@@ -21,12 +29,23 @@ def print_menu():
     print("9- Ejecutar Requerimiento 8 (Bono)")
     print("0- Salir")
 
-def load_data(control):
+data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
+def load_data(control, data_dir):
     """
     Carga los datos
     """
     #TODO: Realizar la carga de datos
-    pass
+    nombre_archivo_usuarios = input("Ingrese el nombre del archivo de usuarios ('users_info_large.csv'): ")
+    nombre_archivo_relaciones = input("Ingrese el nombre del archivo de las relaciones ('relationships_large.csv'): ")
+    catalog =logic.load_data(control, data_dir, nombre_archivo_usuarios, nombre_archivo_relaciones)
+    total_usuarios, total_conexiones, usuarios_basic, usuarios_premium, promedio_seguidores, ciudad_mayor, max_usuarios = logic.report_data(catalog)
+    print(f"Número total de usuarios: {total_usuarios}")
+    print(f"Número total de conexiones: {total_conexiones}")
+    print(f"Número de usuarios Basic: {usuarios_basic}")
+    print(f"Número de usuarios Premium: {usuarios_premium}")
+    print(f"Número promedio de seguidores por usuario: {promedio_seguidores:.2f}")
+    print(f"Ciudad con mayor número de usuarios: {ciudad_mayor} ({max_usuarios} usuarios)")
+    return catalog
 
 
 def print_data(control, id):
@@ -115,7 +134,7 @@ def main():
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 1:
             print("Cargando información de los archivos ....\n")
-            data = load_data(control)
+            data = load_data(control, data_dir)
         elif int(inputs) == 2:
             print_req_1(control)
 
