@@ -163,12 +163,46 @@ def req_4(catalog):
     pass
 
 
-def req_5(catalog):
+def req_5(catalog, Id, N):
     """
-    Retorna el resultado del requerimiento 5
+    Retorna los N amigos que siguen a más usuarios y que son amigos mutuos.
+    
+    Parameters:
+    catalog (dict): Catálogo que contiene la información del grafo.
+    Id (str): ID del usuario origen.
+    N (int): Número de amigos a devolver.
+    
+    Returns:
+    list: Lista de los N amigos que siguen a más usuarios.
     """
-    # TODO: Modificar el requerimiento 5
-    pass
+    amigos = []
+    if graph.contains_vertex(catalog, Id):
+        adj_list = mp_lin.get(catalog["vertices"], Id)  
+        lst_ids = []
+        if adj_list and "elements" in adj_list:
+            for adya in adj_list["elements"]:
+                adya_id = adya['vertex']
+                lst_ids.append(adya_id)
+        for adya_id in lst_ids:
+            seguidos_seguidor = mp_lin.get(catalog["vertices"], adya_id)  
+            if seguidos_seguidor and "elements" in seguidos_seguidor:
+                mutual_following = False
+                for adya_2 in seguidos_seguidor['elements']:
+                    if adya_2['vertex'] == Id:  # Verifica si sigue de vuelta
+                        mutual_following = True
+                        break
+                if mutual_following:
+                    seguidos = len(seguidos_seguidor)
+                    usuario = graph.get_vertex_info(catalog, adya_id)
+                    alias = usuario.get("USER_NAME", "Desconocido")
+                    dict_seguidor = {
+                        "id": adya_id,
+                        "alias": alias,
+                        "seguidos": seguidos,
+                    }
+                    amigos.append(dict_seguidor)
+    amigos_ordenados = merge_sort(amigos, "seguidos")
+    return amigos_ordenados[:N]
 
 def req_6(catalog):
     """
@@ -209,3 +243,51 @@ def delta_time(start, end):
     """
     elapsed = float(end - start)
     return elapsed
+
+def merge_sort(lista, key):
+    """
+    Ordena una lista de diccionarios utilizando Merge Sort basado en una clave dada.
+
+    Parameters:
+    lista (list): Lista de diccionarios a ordenar.
+    key (str): Clave por la que se ordenará la lista (por ejemplo, "seguidos").
+
+    Returns:
+    list: Lista ordenada.
+    """
+    if len(lista) <= 1:
+        return lista
+
+    mid = len(lista) // 2
+    izquierda = merge_sort(lista[:mid], key)
+    derecha = merge_sort(lista[mid:], key)
+
+    return merge(izquierda, derecha, key)
+
+
+def merge(izquierda, derecha, key):
+    """
+    Mezcla dos listas ordenadas en una sola lista ordenada.
+
+    Parameters:
+    izquierda (list): Sublista ordenada.
+    derecha (list): Sublista ordenada.
+    key (str): Clave por la que se ordenará.
+
+    Returns:
+    list: Lista combinada y ordenada.
+    """
+    resultado = []
+    i = j = 0
+
+    while i < len(izquierda) and j < len(derecha):
+        if izquierda[i][key] >= derecha[j][key]:  # Orden descendente
+            resultado.append(izquierda[i])
+            i += 1
+        else:
+            resultado.append(derecha[j])
+            j += 1
+
+    resultado.extend(izquierda[i:])
+    resultado.extend(derecha[j:])
+    return resultado

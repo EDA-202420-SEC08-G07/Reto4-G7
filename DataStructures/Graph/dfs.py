@@ -2,7 +2,7 @@ from DataStructures.Map import map_linear_probing as mp
 from DataStructures.List import array_list as lt
 
 
-def dfs_path(my_graph, start_vertex, end_vertex, visited=None, path=None):
+def dfs_path(graph, vertice_inicial, vertice_destino, visited=None, path=None):
     """
     Busca un camino entre dos nodos utilizando DFS.
     
@@ -21,19 +21,19 @@ def dfs_path(my_graph, start_vertex, end_vertex, visited=None, path=None):
     if path is None:
         path = []  # Lista para almacenar el camino actual
 
-    visited.add(start_vertex)
-    path.append(start_vertex)
+    visited.add(vertice_inicial)
+    path.append(vertice_inicial)
 
-    if start_vertex == end_vertex:
+    if vertice_inicial == vertice_destino:
         return path  # Se encontró el camino
 
     # Obtener los vecinos del nodo actual
-    adj_list = mp.get(my_graph["vertices"], start_vertex)
+    adj_list = mp.get(graph["vertices"], vertice_inicial)
     if adj_list:
         for edge in adj_list["elements"]:
             neighbor = edge["vertex"]
             if neighbor not in visited:
-                result = dfs_path(my_graph, neighbor, end_vertex, visited, path)
+                result = dfs_path(graph, neighbor, vertice_destino, visited, path)
                 if result:
                     return result
 
