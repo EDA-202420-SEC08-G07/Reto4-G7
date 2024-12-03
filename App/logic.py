@@ -64,9 +64,12 @@ def report_data(catalog):
     usuarios_basic = 0
     usuarios_premium = 0
     usuarios_por_ciudad = mp_lin.new_map()
+    grafo = graph.vertices(catalog)
+    vertices = grafo['elements']
     
-    for user_id in graph.vertices(catalog):
-        usuario = mp_lin.get(catalog['vertices'], user_id)
+    for user_id in vertices:
+        user_id = user_id
+        usuario = graph.get_vertex_info(catalog, user_id)
         if not usuario:
             continue
 

@@ -106,5 +106,17 @@ def add_edge(my_graph, vertex_a, vertex_b, weight=0):
             lt.add_last(adj_list_b, {"vertex": vertex_a, "weight": weight})
     return my_graph
 
-
-
+def get_vertex_info(my_graph, vertex_key):
+    """
+    Devuelve la información asociada a un vértice en el grafo.
+    
+    Parameters:
+    my_graph (dict): Grafo donde buscar el vértice.
+    vertex_key (str): Clave del vértice (USER_ID).
+    
+    Returns:
+    dict: Información asociada al vértice o None si no existe.
+    """
+    if mp.contains(my_graph["information"], vertex_key):
+        return mp.get(my_graph["information"], vertex_key)
+    return None
