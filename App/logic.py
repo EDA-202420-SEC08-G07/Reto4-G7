@@ -74,6 +74,7 @@ def report_data(catalog):
     usuarios_por_ciudad = mp_lin.new_map()
     grafo = graph.vertices(catalog)
     vertices = grafo['elements']
+    total_seguidores=0
     
     for user_id in vertices:
         user_id = user_id
@@ -94,7 +95,7 @@ def report_data(catalog):
         else:
             mp_lin.put(usuarios_por_ciudad, ciudad, 1)
 
-    total_seguidores = sum(graph.in_degree(catalog, user_id) or 0 for user_id in graph.vertices(catalog))
+        total_seguidores+=graph.in_degree(catalog, user_id)
     promedio_seguidores = total_seguidores / total_usuarios if total_usuarios > 0 else 0
 
     ciudad_mayor, max_usuarios = None, 0
