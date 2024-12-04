@@ -312,12 +312,22 @@ def req_7(catalog, usuario_a, hobbies_buscar):
     amigos_validos = []
     cantidad = 0
     
-    # Verificar y limpiar lista_hobbies_usuario
+    # Miro los hobbies del usuario insertado
+    info_usuario=graph.get_vertex_info(catalog, usuario_a)
+    hobbies_usuario=info_usuario.get("HOBBIES", "Unknown")
+    hobbies__usuario_t = []
+    if hobbies_usuario != "Unknown":
+        hobbies_usuario = hobbies_usuario.strip("[]").replace("'", "")
+        for hobby in hobbies_usuario.split(","):
+            hobbies__usuario_t.append(hobby.strip().lower())
+    print("Los hobbies del usuario son: ", hobbies__usuario_t)
+    
+    # Verifico y limpio hobbies_buscar
     if isinstance(hobbies_buscar, str):
         hobbies_buscar = [hobbie.strip().lower() for hobbie in hobbies_buscar.split(",")]
     else:
         hobbies_buscar = [hobbie.strip().lower() for hobbie in hobbies_buscar]
-    print("Los hobbies del usuario seleccionado son: ", hobbies_buscar)
+    print("Los hobbies que decidio buscar son: ", hobbies_buscar)
     
     # Encontramos los amigos directos de A y la información de estos
     amigos_directos = obtener_amigos(catalog, usuario_a)
@@ -329,18 +339,19 @@ def req_7(catalog, usuario_a, hobbies_buscar):
         
         hobbies_t = []
         if hobbies != "Unknown":
-            hobbies_t = []
+            hobbies = hobbies.strip("[]").replace("'", "")
             for hobby in hobbies.split(","):
                 hobbies_t.append(hobby.strip().lower())
 
         hobbies_comun = []
+        hobbies_comun_usuario= []
         for hobbie in hobbies_t:
             if hobbie in hobbies_buscar:
                 hobbies_comun.append(hobbie)
-                print(hobbies_comun)
-        
+            if hobbie in hobbies__usuario_t:
+                hobbies_comun_usuario.append(hobbie)
         if hobbies_comun:
-            amigos_validos.append(("1", amigo, hobbies_comun))
+            amigos_validos.append(("1", amigo, hobbies_comun, hobbies_comun_usuario))
             cantidad+=1
 
     # Encontramos amigos implícitos
@@ -353,18 +364,21 @@ def req_7(catalog, usuario_a, hobbies_buscar):
                 
                 hobbies_t = []
                 if hobbies != "Unknown":
-                    hobbies_t = []
+                    hobbies = hobbies.strip("[]").replace("'", "")
                     for hobby in hobbies.split(","):
                         hobbies_t.append(hobby.strip().lower())
-
+                
+                
                 hobbies_comun = []
+                hobbies_comun_usuario= []
                 for hobbie in hobbies_t:
                     if hobbie in hobbies_buscar:
                         hobbies_comun.append(hobbie)
-                        print(hobbies_comun)
+                    if hobbie in hobbies__usuario_t:
+                        hobbies_comun_usuario.append(hobbie)
                 
                 if hobbies_comun:
-                    amigos_validos.append(("2", friend, hobbies_comun))
+                    amigos_validos.append(("2", friend, hobbies_comun, hobbies_comun_usuario))
                     cantidad+=1
 
     return cantidad, amigos_validos

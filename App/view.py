@@ -172,8 +172,11 @@ def print_req_7(control):
     if len(lista_amigos)!=0:
         print("El total de amigos con intereses en comun es de: ", cantidad)
         print("La subred de amigos encontrada es la siguiente: ")
-        for grado, amigo, lista in lista_amigos:
-            print(f"Grado: {grado}, id: {amigo}, con la siguiente lista de hobbies: {lista}")
+        for grado, amigo, lista, comun in lista_amigos:
+            if comun:
+                print(f"El usuario tiene una profundidad de: {grado}, id: {amigo}, y tiene la siguiente lista de hobbies: {lista} y tienen los siguientes hobbies con el usuario buscado: {comun}")
+            else:
+                print(f"El usuario tiene una profundidad de: {grado}, id: {amigo}, y tiene la siguiente lista de hobbies: {lista} pero no tienen ningun hobbie en comun con el usuario buscado")
     else:
         print("No se encontraron amigos con los mismos intereses")
 
