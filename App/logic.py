@@ -305,7 +305,7 @@ def req_6(catalog, N):
 
 
 
-def req_7(catalog, usuario_a, lista_hobbies_usuario):
+def req_7(catalog, usuario_a, hobbies_buscar):
     """
     Establecer una subred de usuarios con intereses similares a partir de un usuario dado.
     """
@@ -313,11 +313,12 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
     cantidad = 0
     
     # Verificar y limpiar lista_hobbies_usuario
-    if isinstance(lista_hobbies_usuario, str):
-        lista_hobbies_usuario = [hobbie.strip().lower() for hobbie in lista_hobbies_usuario.split(",")]
+    if isinstance(hobbies_buscar, str):
+        hobbies_buscar = [hobbie.strip().lower() for hobbie in hobbies_buscar.split(",")]
     else:
-        lista_hobbies_usuario = [hobbie.strip().lower() for hobbie in lista_hobbies_usuario]
-
+        hobbies_buscar = [hobbie.strip().lower() for hobbie in hobbies_buscar]
+    print("Los hobbies del usuario seleccionado son: ", hobbies_buscar)
+    
     # Encontramos los amigos directos de A y la información de estos
     amigos_directos = obtener_amigos(catalog, usuario_a)
     
@@ -326,15 +327,17 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
         informacion_amigo = graph.get_vertex_info(catalog, amigo)
         hobbies = informacion_amigo.get("HOBBIES", "Unknown")
         
+        hobbies_t = []
         if hobbies != "Unknown":
-            hobbies = [hobby.strip().lower() for hobby in hobbies.split(",")]
-        else:
-            hobbies = []
+            hobbies_t = []
+            for hobby in hobbies.split(","):
+                hobbies_t.append(hobby.strip().lower())
 
         hobbies_comun = []
-        for hobbie in hobbies:
-            if hobbie in lista_hobbies_usuario:
+        for hobbie in hobbies_t:
+            if hobbie in hobbies_buscar:
                 hobbies_comun.append(hobbie)
+                print(hobbies_comun)
         
         if hobbies_comun:
             amigos_validos.append(("1", amigo, hobbies_comun))
@@ -348,15 +351,17 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
                 informacion_amigo = graph.get_vertex_info(catalog, friend)
                 hobbies = informacion_amigo.get("HOBBIES", "Unknown")
                 
+                hobbies_t = []
                 if hobbies != "Unknown":
-                    hobbies = [hobby.strip().lower() for hobby in hobbies.split(",")]
-                else:
-                    hobbies = []
+                    hobbies_t = []
+                    for hobby in hobbies.split(","):
+                        hobbies_t.append(hobby.strip().lower())
 
                 hobbies_comun = []
-                for hobbie in hobbies:
-                    if hobbie in lista_hobbies_usuario:
+                for hobbie in hobbies_t:
+                    if hobbie in hobbies_buscar:
                         hobbies_comun.append(hobbie)
+                        print(hobbies_comun)
                 
                 if hobbies_comun:
                     amigos_validos.append(("2", friend, hobbies_comun))
