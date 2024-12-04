@@ -11,8 +11,8 @@ from DataStructures.Map import map_linear_probing as mp_lin
 from DataStructures.List import array_list as lt
 from DataStructures.Graph import dfs as dfs
 from DataStructures.Graph import bfs as bfs
-from DataStructures.Tree import binary_search_tree as bst
-from DataStructures.Tree import red_black_tree as rbt
+import folium
+from math import radians, cos, sin, sqrt, atan2
 
 sys.setrecursionlimit(10000)
 
@@ -172,12 +172,57 @@ def req_2(catalog, user_id_a, user_id_b):
     return ("PREMIUM"), ("PREMIUM")
 
 
-def req_3(catalog):
+def req_3(catalog, user_id):
     """
-    Retorna el resultado del requerimiento 3
+    Identifica entre los amigos de un usuario A quién tiene la mayor cantidad de seguidores.
+    Args:
+        catalog: Catálogo que contiene la información del grafo.
+        user_id: ID del usuario desde donde se inicia la búsqueda.
+    Returns:
+        Tiempo de ejecución, información del amigo más popular, y cantidad total de sus seguidores.
     """
-    # TODO: Modificar el requerimiento 3
-    pass
+    start_time = get_time()
+
+    if not graph.contains_vertex(catalog, user_id):
+        return None, None, None
+
+    # Obtener los amigos del usuario (nodos adyacentes)
+    adj_list = graph.adjacents(catalog, user_id)  # Lista de amigos del usuario
+
+    if lt.size(adj_list) == 0:
+        return None, None, None  
+
+    amigo_mas_popular = None
+    max_seguidores = -1
+
+    for i in range(1, lt.size(adj_list)):
+        amigo = lt.get_element(adj_list, i)  # Obtenemos el amigo
+        seguidores = graph.in_degree(catalog, amigo)  # Obtenemos seguidores del amigo
+
+        if seguidores > max_seguidores:
+            max_seguidores = seguidores
+            amigo_mas_popular = amigo
+
+    # Obtenemos información del amigo más popular
+    if amigo_mas_popular:
+        info_amigo = graph.get_vertex_info(catalog, amigo_mas_popular)
+        alias = info_amigo.get("USER_NAME", "Desconocido")
+        tipo = info_amigo.get("USER_TYPE", "Desconocido")
+
+        end_time = get_time()
+        tiempo_ejecucion = delta_time(start_time, end_time)
+
+        return tiempo_ejecucion, {
+            "id": amigo_mas_popular,
+            "alias": alias,
+            "tipo": tipo,
+            "seguidores": max_seguidores
+        }, max_seguidores
+
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+
+    return tiempo_ejecucion, None, 0
 
 def obtener_amigos(catalog, user_id):
         """
@@ -311,13 +356,24 @@ def req_7(catalog, usuario_a, hobbies_buscar):
     """
     amigos_validos = []
     cantidad = 0
+    directos = 0
+    indirectos = 0
+    # Miro los hobbies del usuario insertado
+    info_usuario=graph.get_vertex_info(catalog, usuario_a)
+    hobbies_usuario=info_usuario.get("HOBBIES", "Unknown")
+    hobbies__usuario_t = []
+    if hobbies_usuario != "Unknown":
+        hobbies_usuario = hobbies_usuario.strip("[]").replace("'", "")
+        for hobby in hobbies_usuario.split(","):
+            hobbies__usuario_t.append(hobby.strip().lower())
+    print("Los hobbies del usuario dado son: ", hobbies__usuario_t)
     
-    # Verificar y limpiar lista_hobbies_usuario
+    # Verifico y limpio hobbies_buscar
     if isinstance(hobbies_buscar, str):
         hobbies_buscar = [hobbie.strip().lower() for hobbie in hobbies_buscar.split(",")]
     else:
         hobbies_buscar = [hobbie.strip().lower() for hobbie in hobbies_buscar]
-    print("Los hobbies del usuario seleccionado son: ", hobbies_buscar)
+    print("Los hobbies que decidio buscar son: ", hobbies_buscar)
     
     # Encontramos los amigos directos de A y la información de estos
     amigos_directos = obtener_amigos(catalog, usuario_a)
@@ -329,19 +385,21 @@ def req_7(catalog, usuario_a, hobbies_buscar):
         
         hobbies_t = []
         if hobbies != "Unknown":
-            hobbies_t = []
+            hobbies = hobbies.strip("[]").replace("'", "")
             for hobby in hobbies.split(","):
                 hobbies_t.append(hobby.strip().lower())
 
         hobbies_comun = []
+        hobbies_comun_usuario= []
         for hobbie in hobbies_t:
             if hobbie in hobbies_buscar:
                 hobbies_comun.append(hobbie)
-                print(hobbies_comun)
-        
+            if hobbie in hobbies__usuario_t:
+                hobbies_comun_usuario.append(hobbie)
         if hobbies_comun:
-            amigos_validos.append(("1", amigo, hobbies_comun))
+            amigos_validos.append(("1", amigo, hobbies_comun, hobbies_comun_usuario))
             cantidad+=1
+            directos+=1
 
     # Encontramos amigos implícitos
     for amigo in amigos_directos:
@@ -353,31 +411,98 @@ def req_7(catalog, usuario_a, hobbies_buscar):
                 
                 hobbies_t = []
                 if hobbies != "Unknown":
-                    hobbies_t = []
+                    hobbies = hobbies.strip("[]").replace("'", "")
                     for hobby in hobbies.split(","):
                         hobbies_t.append(hobby.strip().lower())
-
+                
+                
                 hobbies_comun = []
+                hobbies_comun_usuario= []
                 for hobbie in hobbies_t:
                     if hobbie in hobbies_buscar:
                         hobbies_comun.append(hobbie)
-                        print(hobbies_comun)
+                    if hobbie in hobbies__usuario_t:
+                        hobbies_comun_usuario.append(hobbie)
                 
                 if hobbies_comun:
-                    amigos_validos.append(("2", friend, hobbies_comun))
+                    amigos_validos.append(("2", friend, hobbies_comun, hobbies_comun_usuario))
                     cantidad+=1
+                    indirectos+=1
+                    
+    return directos, indirectos, cantidad, amigos_validos
 
-    return cantidad, amigos_validos
-
-def req_8(catalog):
+def haversine(lat1, lon1, lat2, lon2):
     """
-    Retorna el resultado del requerimiento 8
+    Calcula la distancia en kilómetros entre dos puntos geográficos usando la fórmula de Haversine.
+    
+    Args:
+        lat1, lon1: Coordenadas del primer punto (latitud y longitud).
+        lat2, lon2: Coordenadas del segundo punto (latitud y longitud).
+        
+    Returns:
+        Distancia en kilómetros entre los dos puntos.
     """
-    # TODO: Modificar el requerimiento 8
-    pass
+    R = 6371.0  # Radio de la Tierra en kilómetros
+
+    # Convertir grados a radianes
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Fórmula de Haversine
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+
+    return distance
+
+def req_8(catalog, center_lat, center_lon, radius_km):
+    """
+    Grafica a los usuarios dentro de un radio dado en un mapa interactivo utilizando Folium.
+    
+    Args:
+        catalog: Catálogo con información de los usuarios.
+        center_lat, center_lon: Coordenadas del centro (latitud y longitud).
+        radius_km: Radio en kilómetros.
+    
+    Returns:
+        Un mapa interactivo de Folium con los usuarios graficados.
+    """
+    start_time = get_time()
+
+    mapa = folium.Map(location=[center_lat, center_lon], zoom_start=12)
+
+    # Agregar un marcador para el centro
+    folium.Marker(
+        location=[center_lat, center_lon],
+        popup="Centro",
+        icon=folium.Icon(color="red", icon="info-sign")
+    ).add_to(mapa)
+
+    # Iterar sobre los usuarios en el catálogo
+    vertices = graph.vertices(catalog)['elements']  # Obtener todos los nodos del grafo
+    for user_id in vertices:
+        user_info = graph.get_vertex_info(catalog, user_id)
+        if not user_info:
+            continue
+
+        user_lat = float(user_info.get("LATITUDE", 0))
+        user_lon = float(user_info.get("LONGITUDE", 0))
+        distance = haversine(center_lat, center_lon, user_lat, user_lon)
+
+        # Si el usuario está dentro del radio, agregarlo al mapa
+        if distance <= radius_km:
+            folium.Marker(
+                location=[user_lat, user_lon],
+                popup=f"ID: {user_id}\nName: {user_info.get('USER_NAME', 'Unknown')}",
+                icon=folium.Icon(color="blue", icon="user")
+            ).add_to(mapa)
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+
+    return mapa, tiempo_ejecucion
 
 
-# Funciones para medir tiempos de ejecucion
 
 def get_time():
     """
