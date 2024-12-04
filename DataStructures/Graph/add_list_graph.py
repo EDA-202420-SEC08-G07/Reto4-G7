@@ -170,3 +170,27 @@ def minimum_spanning_tree(graph, start_vertex):
     if len(visited) == len(graph["vertices"]):
         return mst_edges  # Árbol completo
     return None  # No es posible conectar todos los nodos
+
+def adjacents(my_graph, vertex):
+    """
+    Devuelve una lista de los vértices adyacentes (amigos) de un vértice dado.
+
+    Parameters:
+    - my_graph (dict): Grafo representado como lista de adyacencia.
+    - vertex (str): Vértice del cual obtener los adyacentes.
+
+    Returns:
+    - list: Lista de vértices adyacentes.
+    - None: Si el vértice no existe en el grafo.
+    """
+    if not mp.contains(my_graph["vertices"], vertex):
+        return None
+
+    adj_list = mp.get(my_graph["vertices"], vertex)
+    adyacentes = lt.new_list()
+
+    # Extraer los vértices adyacentes de la lista de adyacencia
+    for edge in adj_list['elements']:
+        lt.add_last(adyacentes, edge["vertex"])
+
+    return adyacentes

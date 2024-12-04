@@ -170,12 +170,57 @@ def req_2(catalog, user_id_a, user_id_b):
     return ("PREMIUM"), ("PREMIUM")
 
 
-def req_3(catalog):
+def req_3(catalog, user_id):
     """
-    Retorna el resultado del requerimiento 3
+    Identifica entre los amigos de un usuario A quién tiene la mayor cantidad de seguidores.
+    Args:
+        catalog: Catálogo que contiene la información del grafo.
+        user_id: ID del usuario desde donde se inicia la búsqueda.
+    Returns:
+        Tiempo de ejecución, información del amigo más popular, y cantidad total de sus seguidores.
     """
-    # TODO: Modificar el requerimiento 3
-    pass
+    start_time = get_time()
+
+    if not graph.contains_vertex(catalog, user_id):
+        return None, None, None
+
+    # Obtener los amigos del usuario (nodos adyacentes)
+    adj_list = graph.adjacents(catalog, user_id)  # Lista de amigos del usuario
+
+    if lt.size(adj_list) == 0:
+        return None, None, None  
+
+    amigo_mas_popular = None
+    max_seguidores = -1
+
+    for i in range(1, lt.size(adj_list)):
+        amigo = lt.get_element(adj_list, i)  # Obtenemos el amigo
+        seguidores = graph.in_degree(catalog, amigo)  # Obtenemos seguidores del amigo
+
+        if seguidores > max_seguidores:
+            max_seguidores = seguidores
+            amigo_mas_popular = amigo
+
+    # Obtenemos información del amigo más popular
+    if amigo_mas_popular:
+        info_amigo = graph.get_vertex_info(catalog, amigo_mas_popular)
+        alias = info_amigo.get("USER_NAME", "Desconocido")
+        tipo = info_amigo.get("USER_TYPE", "Desconocido")
+
+        end_time = get_time()
+        tiempo_ejecucion = delta_time(start_time, end_time)
+
+        return tiempo_ejecucion, {
+            "id": amigo_mas_popular,
+            "alias": alias,
+            "tipo": tipo,
+            "seguidores": max_seguidores
+        }, max_seguidores
+
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+
+    return tiempo_ejecucion, None, 0
 
 def obtener_amigos(catalog, user_id):
         """
