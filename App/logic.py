@@ -269,11 +269,11 @@ def req_5(catalog, Id, N):
 
 def req_6(catalog, N):
     """
-    Retorna los N usuarios más populares y el MST que los conecta.
+    Retorna los N usuarios más populares y un árbol que los conecta.
     """
     usuarios_populares = []
     
-    # Obtener todos los vértices
+    # Paso 1: Obtener todos los vértices (usuarios)
     vertices = mp_lin.key_set(catalog["vertices"])["elements"]
     
     # Recolectar la información de cada vértice
@@ -288,19 +288,32 @@ def req_6(catalog, N):
                 "seguidores": seguidores
             })
     
-    # Ordenar por número de seguidores en orden descendente
+    # Paso 2: Ordenar por número de seguidores en orden descendente
     usuarios_populares = merge_sort(usuarios_populares, "seguidores")
     
-    
-    # Seleccionar los N usuarios más populares
+    # Paso 3: Seleccionar los N usuarios más populares
     top_users = usuarios_populares[:N]
-    print(usuarios_populares[:10])
-    usuarios_populares = usuarios_populares[::-1]
     
-    # Construir el MST con estos usuarios
-    mst = graph.minimum_spanning_tree(catalog, top_users[0]["id"])
+    # Paso 4: Crear un árbol de conexión entre los N usuarios más populares usando DFS
+    visited = set()  # Para verificar qué usuarios ya fueron visitados
+    tree = []  # Para almacenar las conexiones del árbol
     
-    return top_users, mst
+    # DFS desde el primer usuario en top_users
+    def dfs(u):
+        visited.add(u)
+        adj_list = mp_lin.get(catalog["vertices"], u)
+        if adj_list and "elements" in adj_list:
+            for v in adj_list["elements"]:
+                v_id = v['vertex']
+                if v_id not in visited and v_id in [user["id"] for user in top_users]:
+                    tree.append((u, v_id))
+                    dfs(v_id)
+    
+    # Comenzar DFS desde el primer usuario más popular
+    dfs(top_users[0]["id"])
+    
+    return top_users, tree
+
 
 
 
@@ -442,38 +455,6 @@ def merge(izquierda, derecha, key):
     resultado.extend(derecha[j:])
     return resultado
 
-def completar_conexion(graph, top_users):
-    """
-    Asegura que todos los nodos en `top_users` estén conectados.
-    
-    Parameters:
-    graph (dict): Grafo con la información.
-    top_users (list): Lista de nodos (IDs) que deben estar conectados.
-    
-    Returns:
-    list: Lista de aristas que conectan todos los nodos si no están conectados.
-    """
-    # Obtener el MST inicial
-    mst = graph.minimum_spanning_tree(graph, top_users[0])
-    
-    # Verificar si el MST conecta todos los nodos
-    visitados = set()
-    def dfs(v):
-        visitados.add(v)
-        for vecino in graph.get_neighbors(v):
-            if vecino not in visitados:
-                dfs(vecino)
-    
-    dfs(top_users[0])
-    
-    if len(visitados) == len(top_users):
-        return mst  # MST ya conecta todos los nodos
+import heapq
 
-    # Si no están todos conectados, añadir conexiones faltantes
-    conexiones_faltantes = []
-    for usuario in top_users:
-        if usuario not in visitados:
-            conexiones_faltantes.append((visitados.pop(), usuario))
-            visitados.add(usuario)
-    
-    return mst + conexiones_faltantes
+
