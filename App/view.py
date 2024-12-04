@@ -140,22 +140,18 @@ def print_req_6(control):
         print("El número de usuarios debe ser al menos 2.")
         return
     
-    top_users, mst = logic.req_6(control, N)
+    top_users, tree = logic.req_6(control, N)
     
-    print(f"\nLos {N} usuarios más populares:")
+    # Imprimir los N usuarios más populares
+    print(f"Los {N} usuarios más populares:")
     for user in top_users:
         print(f"ID: {user['id']}, Alias: {user['alias']}, Seguidores: {user['seguidores']}")
 
-    if mst:
-        # Verificar si se necesita completar el MST
-        if len(mst) < N - 1:
-            mst = logic.completar_conexion(control, [user["id"] for user in top_users])
-        
-        print("\nÁrbol de Expansión Mínimo (MST):")
-        for u, v in mst:
-            print(f"({u}) -- ({v})")
-    else:
-        print("\nNo se pudo conectar todos los usuarios en un árbol.")
+# Imprimir el árbol de conexión entre los usuarios
+    print("\nÁrbol de conexión (sin ciclos):")
+    for u, v in tree:
+        print(f"({u}) -- ({v})")
+
 
 
 
