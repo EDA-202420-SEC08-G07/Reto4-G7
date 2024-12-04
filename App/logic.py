@@ -324,7 +324,8 @@ def req_7(catalog, usuario_a, hobbies_buscar):
     """
     amigos_validos = []
     cantidad = 0
-    
+    directos = 0
+    indirectos = 0
     # Miro los hobbies del usuario insertado
     info_usuario=graph.get_vertex_info(catalog, usuario_a)
     hobbies_usuario=info_usuario.get("HOBBIES", "Unknown")
@@ -333,7 +334,7 @@ def req_7(catalog, usuario_a, hobbies_buscar):
         hobbies_usuario = hobbies_usuario.strip("[]").replace("'", "")
         for hobby in hobbies_usuario.split(","):
             hobbies__usuario_t.append(hobby.strip().lower())
-    print("Los hobbies del usuario son: ", hobbies__usuario_t)
+    print("Los hobbies del usuario dado son: ", hobbies__usuario_t)
     
     # Verifico y limpio hobbies_buscar
     if isinstance(hobbies_buscar, str):
@@ -366,6 +367,7 @@ def req_7(catalog, usuario_a, hobbies_buscar):
         if hobbies_comun:
             amigos_validos.append(("1", amigo, hobbies_comun, hobbies_comun_usuario))
             cantidad+=1
+            directos+=1
 
     # Encontramos amigos implícitos
     for amigo in amigos_directos:
@@ -393,8 +395,9 @@ def req_7(catalog, usuario_a, hobbies_buscar):
                 if hobbies_comun:
                     amigos_validos.append(("2", friend, hobbies_comun, hobbies_comun_usuario))
                     cantidad+=1
-
-    return cantidad, amigos_validos
+                    indirectos+=1
+                    
+    return directos, indirectos, cantidad, amigos_validos
 
 def req_8(catalog):
     """
