@@ -133,10 +133,30 @@ def print_req_5(control):
 
 def print_req_6(control):
     """
-        Función que imprime la solución del Requerimiento 6 en consola
+    Imprime la solución del Requerimiento 6 en consola.
     """
-    # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    N = int(input("Ingrese el número de usuarios más populares que desea consultar (N >= 2): "))
+    if N < 2:
+        print("El número de usuarios debe ser al menos 2.")
+        return
+    
+    top_users, mst = logic.req_6(control, N)
+    
+    print(f"\nLos {N} usuarios más populares:")
+    for user in top_users:
+        print(f"ID: {user['id']}, Alias: {user['alias']}, Seguidores: {user['seguidores']}")
+
+    if mst:
+        # Verificar si se necesita completar el MST
+        if len(mst) < N - 1:
+            mst = logic.completar_conexion(control, [user["id"] for user in top_users])
+        
+        print("\nÁrbol de Expansión Mínimo (MST):")
+        for u, v in mst:
+            print(f"({u}) -- ({v})")
+    else:
+        print("\nNo se pudo conectar todos los usuarios en un árbol.")
+
 
 
 def print_req_7(control):

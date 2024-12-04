@@ -231,43 +231,78 @@ def req_5(catalog, Id, N):
     N (int): Número de amigos a devolver.
     
     Returns:
-    list: Lista de los N amigos que siguen a más usuarios.
+    list: Lista de los N amigos que siguen a más usuarios, ordenada por seguidos.
     """
     amigos = []
+    
+    # Verificar si el vértice existe
     if graph.contains_vertex(catalog, Id):
-        adj_list = mp_lin.get(catalog["vertices"], Id)  
-        lst_ids = []
+        # Obtener la lista de adyacencia del usuario actual
+        adj_list = mp_lin.get(catalog["vertices"], Id)
+        
         if adj_list and "elements" in adj_list:
-            for adya in adj_list["elements"]:
-                adya_id = adya['vertex']
-                lst_ids.append(adya_id)
-        for adya_id in lst_ids:
-            seguidos_seguidor = mp_lin.get(catalog["vertices"], adya_id)  
-            if seguidos_seguidor and "elements" in seguidos_seguidor:
-                mutual_following = False
-                for adya_2 in seguidos_seguidor['elements']:
-                    if adya_2['vertex'] == Id:  # Verifica si sigue de vuelta
-                        mutual_following = True
-                        break
-                if mutual_following:
-                    seguidos = len(seguidos_seguidor)
-                    usuario = graph.get_vertex_info(catalog, adya_id)
-                    alias = usuario.get("USER_NAME", "Desconocido")
-                    dict_seguidor = {
-                        "id": adya_id,
-                        "alias": alias,
-                        "seguidos": seguidos,
-                    }
-                    amigos.append(dict_seguidor)
-    amigos_ordenados = merge_sort(amigos, "seguidos")
+            lst_ids = [adya['vertex'] for adya in adj_list["elements"]]  # Obtener IDs de los amigos
+
+            for adya_id in lst_ids:
+                seguidos_seguidor = mp_lin.get(catalog["vertices"], adya_id)
+                if seguidos_seguidor and "elements" in seguidos_seguidor:
+                    # Verificar si existe relación mutua
+                    mutual_following = any(adya_2['vertex'] == Id for adya_2 in seguidos_seguidor['elements'])
+                    
+                    if mutual_following:
+                        seguidos = len(seguidos_seguidor["elements"])  # Número de usuarios que sigue
+                        usuario = graph.get_vertex_info(catalog, adya_id)
+                        alias = usuario.get("USER_NAME", "Desconocido")
+                        
+                        dict_seguidor = {
+                            "id": adya_id,
+                            "alias": alias,
+                            "seguidos": seguidos
+                        }
+                        amigos.append(dict_seguidor)
+
+    # Ordenar por número de seguidos en orden descendente
+    amigos_ordenados = merge_sort(amigos, "seguidos")  
+    # Retornar los N amigos que siguen a más usuarios
     return amigos_ordenados[:N]
 
-def req_6(catalog):
+
+def req_6(catalog, N):
     """
-    Retorna el resultado del requerimiento 6
+    Retorna los N usuarios más populares y el MST que los conecta.
     """
-    # TODO: Modificar el requerimiento 6
-    pass
+    usuarios_populares = []
+    
+    # Obtener todos los vértices
+    vertices = mp_lin.key_set(catalog["vertices"])["elements"]
+    
+    # Recolectar la información de cada vértice
+    for vertice in vertices:
+        seguidores = graph.degree(catalog, vertice)
+        if seguidores is not None and seguidores > 0:
+            usuario = graph.get_vertex_info(catalog, vertice)
+            alias = usuario.get("USER_NAME", "Desconocido")
+            usuarios_populares.append({
+                "id": vertice,
+                "alias": alias,
+                "seguidores": seguidores
+            })
+    
+    # Ordenar por número de seguidores en orden descendente
+    usuarios_populares = merge_sort(usuarios_populares, "seguidores")
+    
+    
+    # Seleccionar los N usuarios más populares
+    top_users = usuarios_populares[:N]
+    print(usuarios_populares[:10])
+    usuarios_populares = usuarios_populares[::-1]
+    
+    # Construir el MST con estos usuarios
+    mst = graph.minimum_spanning_tree(catalog, top_users[0]["id"])
+    
+    return top_users, mst
+
+
 
 
 def req_7(catalog, usuario_a, lista_hobbies_usuario):
@@ -400,3 +435,39 @@ def merge(izquierda, derecha, key):
     resultado.extend(izquierda[i:])
     resultado.extend(derecha[j:])
     return resultado
+
+def completar_conexion(graph, top_users):
+    """
+    Asegura que todos los nodos en `top_users` estén conectados.
+    
+    Parameters:
+    graph (dict): Grafo con la información.
+    top_users (list): Lista de nodos (IDs) que deben estar conectados.
+    
+    Returns:
+    list: Lista de aristas que conectan todos los nodos si no están conectados.
+    """
+    # Obtener el MST inicial
+    mst = graph.minimum_spanning_tree(graph, top_users[0])
+    
+    # Verificar si el MST conecta todos los nodos
+    visitados = set()
+    def dfs(v):
+        visitados.add(v)
+        for vecino in graph.get_neighbors(v):
+            if vecino not in visitados:
+                dfs(vecino)
+    
+    dfs(top_users[0])
+    
+    if len(visitados) == len(top_users):
+        return mst  # MST ya conecta todos los nodos
+
+    # Si no están todos conectados, añadir conexiones faltantes
+    conexiones_faltantes = []
+    for usuario in top_users:
+        if usuario not in visitados:
+            conexiones_faltantes.append((visitados.pop(), usuario))
+            visitados.add(usuario)
+    
+    return mst + conexiones_faltantes
