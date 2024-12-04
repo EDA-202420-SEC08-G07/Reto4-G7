@@ -11,6 +11,9 @@ from DataStructures.Map import map_linear_probing as mp_lin
 from DataStructures.List import array_list as lt
 from DataStructures.Graph import dfs as dfs
 from DataStructures.Graph import bfs as bfs
+import folium
+from math import radians, cos, sin, sqrt, atan2
+
 
 sys.setrecursionlimit(10000)
 
@@ -444,15 +447,78 @@ def req_7(catalog, usuario_a, hobbies_buscar):
                     
     return directos, indirectos, cantidad, amigos_validos
 
-def req_8(catalog):
+def haversine(lat1, lon1, lat2, lon2):
     """
-    Retorna el resultado del requerimiento 8
+    Calcula la distancia en kilómetros entre dos puntos geográficos usando la fórmula de Haversine.
+    
+    Args:
+        lat1, lon1: Coordenadas del primer punto (latitud y longitud).
+        lat2, lon2: Coordenadas del segundo punto (latitud y longitud).
+        
+    Returns:
+        Distancia en kilómetros entre los dos puntos.
     """
-    # TODO: Modificar el requerimiento 8
-    pass
+    R = 6371.0  # Radio de la Tierra en kilómetros
+
+    # Convertir grados a radianes
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Fórmula de Haversine
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+
+    return distance
+
+def req_8(catalog, center_lat, center_lon, radius_km):
+    """
+    Grafica a los usuarios dentro de un radio dado en un mapa interactivo utilizando Folium.
+    
+    Args:
+        catalog: Catálogo con información de los usuarios.
+        center_lat, center_lon: Coordenadas del centro (latitud y longitud).
+        radius_km: Radio en kilómetros.
+    
+    Returns:
+        Un mapa interactivo de Folium con los usuarios graficados.
+    """
+    start_time = get_time()
+
+    mapa = folium.Map(location=[center_lat, center_lon], zoom_start=12)
+
+    # Agregar un marcador para el centro
+    folium.Marker(
+        location=[center_lat, center_lon],
+        popup="Centro",
+        icon=folium.Icon(color="red", icon="info-sign")
+    ).add_to(mapa)
+
+    # Iterar sobre los usuarios en el catálogo
+    vertices = graph.vertices(catalog)['elements']  # Obtener todos los nodos del grafo
+    for user_id in vertices:
+        user_info = graph.get_vertex_info(catalog, user_id)
+        if not user_info:
+            continue
+
+        user_lat = float(user_info.get("LATITUDE", 0))
+        user_lon = float(user_info.get("LONGITUDE", 0))
+        distance = haversine(center_lat, center_lon, user_lat, user_lon)
+
+        # Si el usuario está dentro del radio, agregarlo al mapa
+        if distance <= radius_km:
+            folium.Marker(
+                location=[user_lat, user_lon],
+                popup=f"ID: {user_id}\nName: {user_info.get('USER_NAME', 'Unknown')}",
+                icon=folium.Icon(color="blue", icon="user")
+            ).add_to(mapa)
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+
+    return mapa, tiempo_ejecucion
 
 
-# Funciones para medir tiempos de ejecucion
 
 def get_time():
     """

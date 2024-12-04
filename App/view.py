@@ -201,10 +201,25 @@ def print_req_7(control):
 
 def print_req_8(control):
     """
-        Función que imprime la solución del Requerimiento 8 en consola
+    Función que imprime la solución del Requerimiento 8 en consola.
+    Permite graficar en un mapa los usuarios dentro de un radio dado desde unas coordenadas específicas.
     """
-    # TODO: Imprimir el resultado del requerimiento 8
-    pass
+    center_lat = float(input("Ingrese la latitud del centro: "))
+    center_lon = float(input("Ingrese la longitud del centro: "))
+    radius_km = float(input("Ingrese el radio en kilómetros: "))
+
+    resultado = logic.req_8(control, center_lat, center_lon, radius_km)
+    mapa = resultado[0]
+    tiempo = resultado[1]
+
+    # Guardamos el mapa en un archivo HTML
+    file_name = "usuarios_mapa.html"
+    mapa.save(file_name)
+    
+    print(f'El tiempo del algoritmo fue {tiempo} ms')
+    print(f"El mapa ha sido generado exitosamente y guardado como '{file_name}'.")
+    print(f"Abra el archivo '{file_name}' en su navegador para visualizar el mapa interactivo.")
+    #IMPORTANTE El archivo usuarios_mapa.html se guardará en el mismo directorio donde se está ejecutando el codigo de Python.
 
 
 # Se crea la lógica asociado a la vista
