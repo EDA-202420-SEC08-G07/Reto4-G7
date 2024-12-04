@@ -269,13 +269,27 @@ def req_6(catalog):
     pass
 
 
-def req_7(catalog):
+def req_7(catalog, usuario_a, lista_hobbies_usuario):
     """
-    Retorna el resultado del requerimiento 7
+    Establecer una subred de usuarios con intereses similares a partir de un usuario dad
     """
-    # TODO: Modificar el requerimiento 7
-    pass
-
+    amigos_validos=[]
+    cantidad=0
+    # Encontramos los amigos directos de A y la informacion de estos
+    amigos_directos= obtener_amigos(catalog, usuario_a)
+    cantidad+=len(amigos_directos)
+    for amigo in amigos_directos:
+        informacion_amigo=graph.get_vertex_info(catalog, amigo)
+        hobbies=informacion_amigo.get("HOBBIES", "Unknown")
+        hobbies_comun=[]
+        for hobbie in hobbies:
+            if hobbie in lista_hobbies_usuario:
+                hobbies_comun.append(hobbie)
+        amigos_validos.append(("1", hobbies_comun))
+                
+    # Encontramos amigos implicitos (A amigos B, B amigo C entonces A amigo C)
+    
+    
 
 def req_8(catalog):
     """
