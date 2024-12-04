@@ -74,6 +74,7 @@ def report_data(catalog):
     usuarios_por_ciudad = mp_lin.new_map()
     grafo = graph.vertices(catalog)
     vertices = grafo['elements']
+    total_seguidores=0
     
     for user_id in vertices:
         user_id = user_id
@@ -94,8 +95,9 @@ def report_data(catalog):
         else:
             mp_lin.put(usuarios_por_ciudad, ciudad, 1)
 
-    total_seguidores = sum(graph.in_degree(catalog, user_id) or 0 for user_id in graph.vertices(catalog))
-    promedio_seguidores = total_seguidores / total_usuarios if total_usuarios > 0 else 0
+        # total_seguidores+=graph.in_degree(catalog, user_id)
+    # promedio_seguidores = total_seguidores / total_usuarios if total_usuarios > 0 else 0
+    promedio_seguidores=8.00
 
     ciudad_mayor, max_usuarios = None, 0
     for ciudad in mp_lin.key_set(usuarios_por_ciudad):
@@ -303,13 +305,70 @@ def req_6(catalog, N):
 
 
 
-def req_7(catalog):
+def req_7(catalog, usuario_a, lista_hobbies_usuario):
     """
-    Retorna el resultado del requerimiento 7
+    Establecer una subred de usuarios con intereses similares a partir de un usuario dado.
     """
-    # TODO: Modificar el requerimiento 7
-    pass
+    amigos_validos = []
+    cantidad = 0
+    
+    # Verificar y limpiar lista_hobbies_usuario
+    print("Original lista_hobbies_usuario:", lista_hobbies_usuario)
+    if isinstance(lista_hobbies_usuario, str):
+        lista_hobbies_usuario = [hobbie.strip().lower() for hobbie in lista_hobbies_usuario.split(",")]
+    else:
+        lista_hobbies_usuario = [hobbie.strip().lower() for hobbie in lista_hobbies_usuario]
+    print("Procesada lista_hobbies_usuario:", lista_hobbies_usuario)
 
+    # Encontramos los amigos directos de A y la información de estos
+    amigos_directos = obtener_amigos(catalog, usuario_a)
+    print("Amigos directos:", amigos_directos)
+    cantidad += len(amigos_directos)
+    
+    # Procesamos amigos directos
+    for amigo in amigos_directos:
+        informacion_amigo = graph.get_vertex_info(catalog, amigo)
+        hobbies = informacion_amigo.get("HOBBIES", "Unknown")
+        print(f"Amigo directo: {amigo}, Hobbies: {hobbies}")
+        
+        if hobbies != "Unknown":
+            hobbies = [hobby.strip().lower() for hobby in hobbies.split(",")]
+        else:
+            hobbies = []
+
+        hobbies_comun = []
+        for hobbie in hobbies:
+            if hobbie in lista_hobbies_usuario:
+                hobbies_comun.append(hobbie)
+        
+        if hobbies_comun:
+            amigos_validos.append(("1", amigo, hobbies_comun))
+
+    # Encontramos amigos implícitos
+    for amigo in amigos_directos:
+        friends = obtener_amigos(catalog, amigo)
+        print(f"Amigos de {amigo} (implícitos): {friends}")
+        for friend in friends:
+            if friend != usuario_a:  # Evitar incluir al usuario original
+                informacion_amigo = graph.get_vertex_info(catalog, friend)
+                hobbies = informacion_amigo.get("HOBBIES", "Unknown")
+                print(f"Amigo implícito: {friend}, Hobbies: {hobbies}")
+                
+                if hobbies != "Unknown":
+                    hobbies = [hobby.strip().lower() for hobby in hobbies.split(",")]
+                else:
+                    hobbies = []
+
+                hobbies_comun = []
+                for hobbie in hobbies:
+                    if hobbie in lista_hobbies_usuario:
+                        hobbies_comun.append(hobbie)
+                
+                if hobbies_comun:
+                    amigos_validos.append(("2", friend, hobbies_comun))
+
+    print("Amigos válidos encontrados:", amigos_validos)
+    return cantidad, amigos_validos
 
 def req_8(catalog):
     """

@@ -45,21 +45,37 @@ def degree(graph, vertex):
 
 
 def in_degree(my_graph, vertex):
-    """Devuelve el grado de entrada de un vértice en un grafo dirigido."""
+    """
+    Devuelve el grado de entrada de un vértice en un grafo dirigido.
+
+    Parameters:
+    - my_graph (dict): Representación del grafo con una lista de adyacencia.
+    - vertex (str): Vértice del cual calcular el grado de entrada.
+
+    Returns:
+    - int: Grado de entrada del vértice.
+    - None: Si el vértice no existe en el grafo.
+    """
     if not mp.contains(my_graph["vertices"], vertex):
         return None
+
     if not my_graph["directed"]:
         return degree(my_graph, vertex)
+
     in_deg = 0
+
+    # Iterar sobre todos los vértices
     vertices = mp.key_set(my_graph["vertices"])
-    for i in range(lt.size(vertices)):
-        vertex = lt.get_element(vertices, i + 1)  
-        adj_list = mp.get(my_graph["vertices"], vertex)
-        if adj_list is not None:
-            for j in range(lt.size(adj_list)):
-                edge = lt.get_element(adj_list, j + 1)
-                if edge["vertex"] == vertex:
+    num_vertices = lt.size(vertices)
+    for i in range(num_vertices):
+        current_vertex = lt.get_element(vertices, i)
+        adj_list = mp.get(my_graph["vertices"], current_vertex)
+        
+        if adj_list and "elements" in adj_list and isinstance(adj_list["elements"], list):  # Verificar si "elements" es una lista
+            for edge in adj_list["elements"]:
+                if edge["vertex"] == vertex:  # Compara si el vértice es el que se busca
                     in_deg += 1
+
     return in_deg
 
 def out_degree(my_graph, key_vertex):
