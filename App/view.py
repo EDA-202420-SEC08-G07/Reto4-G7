@@ -61,7 +61,11 @@ def print_req_1(control):
     """
     usuario_a = input("ingrese el id del usuario a: ")
     usuario_b = input("ingrese el id del usuario b: ")
+    start_time = logic.get_time()
     total, camino = logic.req_1(control, usuario_a, usuario_b)
+    end_time = logic.get_time()
+    elapsed_time = logic.delta_time(start_time, end_time)
+    print(f"El tiempo de ejecución fue: {elapsed_time} ms")
     if total is not None:
         print(f'Si hay un camino entre el usuario {usuario_a} y el usuario {usuario_b}')
         print(f'El total de conexiones es de {total}')
@@ -78,7 +82,11 @@ def print_req_2(control):
     """
     usuario_a = input("ingrese el id del usuario a: ")
     usuario_b = input("ingrese el id del usuario b: ")
+    start_time = logic.get_time()
     total, camino = logic.req_2(control, usuario_a, usuario_b)
+    end_time = logic.get_time()
+    elapsed_time = logic.delta_time(start_time, end_time)
+    print(f"El tiempo de ejecución fue: {elapsed_time} ms")
     if total=="PREMIUM":
         print("ERROR")
         print(f'El usuario {usuario_a} es PREMIUM')
@@ -124,7 +132,11 @@ def print_req_4(control):
     """
     usuario_a = input("ingrese el id del usuario a: ")
     usuario_b = input("ingrese el id del usuario b: ")
+    start_time = logic.get_time()
     lista=logic.req_4(control, usuario_a, usuario_b)
+    end_time = logic.get_time()
+    elapsed_time = logic.delta_time(start_time, end_time)
+    print(f"El tiempo de ejecución fue: {elapsed_time} ms")
     if lista is not None:
         print('La lista de los amigos en comun es de: ')
         for id, alias, type_user in lista:
@@ -139,7 +151,11 @@ def print_req_5(control):
     """
     usuario_a = input("Ingrese el ID del usuario: ")
     n = int(input("Ingrese la cantidad de amigos que siguen a más usuarios (N): "))
+    start_time = logic.get_time()
     amigos_ordenados = logic.req_5(control, usuario_a, n)
+    end_time = logic.get_time()
+    elapsed_time = logic.delta_time(start_time, end_time)
+    print(f"El tiempo de ejecución fue: {elapsed_time} ms")
     if amigos_ordenados:
         print(f"\nLos {n} amigos que siguen a más usuarios en la red son:\n")
         for amigo in amigos_ordenados:
@@ -156,18 +172,20 @@ def print_req_6(control):
     if N < 2:
         print("El número de usuarios debe ser al menos 2.")
         return
-    
-    top_users, tree = logic.req_6(control, N)
-    
-    # Imprimir los N usuarios más populares
-    print(f"Los {N} usuarios más populares:")
+    start_time = logic.get_time()
+    top_users, arbol = logic.req_6(control, N)
+    end_time = logic.get_time()
+    elapsed_time = logic.delta_time(start_time, end_time)
+    print(f"El tiempo de ejecución fue: {elapsed_time} ms")
+    print(f"\nLos {N} usuarios más populares:")
     for user in top_users:
         print(f"ID: {user['id']}, Alias: {user['alias']}, Seguidores: {user['seguidores']}")
-
-# Imprimir el árbol de conexión entre los usuarios
-    print("\nÁrbol de conexión (sin ciclos):")
-    for u, v in tree:
-        print(f"({u}) -- ({v})")
+    if arbol:
+        print("\nÁrbol que conecta a los usuarios más populares:")
+        for key in bst.key_set(arbol)["elements"]:
+            print(f"Nodo: {key}")
+    else:
+        print("No se pudo conectar a todos los usuarios en un árbol.")
 
 
 
@@ -182,7 +200,11 @@ def print_req_7(control):
     lista_hobbies = lista_hobbies.split(",")
     for i in range(len(lista_hobbies)):
         lista_hobbies[i] = lista_hobbies[i].strip()
+    start_time = logic.get_time()
     directos, indirectos, cantidad, lista_amigos=logic.req_7(control, usuario_a, lista_hobbies)
+    end_time = logic.get_time()
+    elapsed_time = logic.delta_time(start_time, end_time)
+    print(f"El tiempo de ejecución fue: {elapsed_time} ms")
     if len(lista_amigos)!=0:
         print("El total de amigos con intereses en comun es de: ", cantidad)
         print(f"Tiene un total de {directos} amigos directos y {indirectos} amigos indirectos")

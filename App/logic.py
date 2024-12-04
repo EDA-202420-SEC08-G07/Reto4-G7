@@ -11,6 +11,7 @@ from DataStructures.Map import map_linear_probing as mp_lin
 from DataStructures.List import array_list as lt
 from DataStructures.Graph import dfs as dfs
 from DataStructures.Graph import bfs as bfs
+from DataStructures.Tree import red_black_tree as rbt
 import folium
 from math import radians, cos, sin, sqrt, atan2
 
