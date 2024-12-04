@@ -397,10 +397,27 @@ def print_req_2(control):
 
 def print_req_3(control):
     """
-        Función que imprime la solución del Requerimiento 3 en consola
+    Función que imprime la solución del Requerimiento 3 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    user_id = input('Ingrese el ID del usuario al cual desea averiguar su amigo con más seguidores: ')
+    resultado = logic.req_3(control, user_id)
+    tiempo = resultado[0]
+    amigo_popular = resultado[1]
+    max_seguidores = resultado[2]
+
+    print(f'El tiempo del algoritmo fue {tiempo} ms')
+
+    if amigo_popular:
+        table = tabulate(
+            [[amigo_popular['id'], amigo_popular['alias'], amigo_popular['tipo'], amigo_popular['seguidores']]],
+            headers=['ID', 'Alias', 'Tipo', 'Seguidores'],
+            tablefmt='grid'
+        )
+        print(f'\nEl amigo más popular del usuario {user_id} según su cantidad de seguidores es:')
+        print(table)
+        print(f'\nLa cantidad total de seguidores del amigo más popular es: {max_seguidores}')
+    else:
+        print(f'\nEl usuario {user_id} no tiene amigos o no se encontró un amigo más popular.')
 
 
 def print_req_4(control):
@@ -498,18 +515,20 @@ def print_req_8(control):
     center_lat = float(input("Ingrese la latitud del centro: "))
     center_lon = float(input("Ingrese la longitud del centro: "))
     radius_km = float(input("Ingrese el radio en kilómetros: "))
-
+    
     resultado = logic.req_8(control, center_lat, center_lon, radius_km)
+    
     mapa = resultado[0]
     tiempo = resultado[1]
-
+    
     # Guardamos el mapa en un archivo HTML
     file_name = "usuarios_mapa.html"
     mapa.save(file_name)
+    
     print(f'El tiempo del algoritmo fue {tiempo} ms')
     print(f"El mapa ha sido generado exitosamente y guardado como '{file_name}'.")
     print(f"Abra el archivo '{file_name}' en su navegador para visualizar el mapa interactivo.")
-    
+    #IMPORTANTE El archivo usuarios_mapa.html se guardará en el mismo directorio donde se está ejecutando el codigo de Python.
 
 
 
