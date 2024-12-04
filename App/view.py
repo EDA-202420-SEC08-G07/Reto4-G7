@@ -144,7 +144,7 @@ def print_req_7(control):
         Función que imprime la solución del Requerimiento 7 en consola
     """
     usuario_a = input("Ingrese el ID del usuario: ")
-    lista_hobbies = input("Ingrese los hobbies de los cuales desea conocer la subred: ")
+    lista_hobbies = input("Ingrese los hobbies de los cuales desea conocer la subred: ('tango', 'parapente')")
     lista_hobbies = lista_hobbies.split(",")
     for i in range(len(lista_hobbies)):
         lista_hobbies[i] = lista_hobbies[i].strip()
@@ -152,8 +152,8 @@ def print_req_7(control):
     if len(lista_amigos)!=0:
         print("El total de amigos con intereses en comun es de: ", cantidad)
         print("La subred de amigos encontrada es la siguiente: ")
-        for amigo, lista in lista_amigos:
-            print(f"Nombre: {amigo}, con la siguiente lista de hobbies: {lista}")
+        for grado, amigo, lista in lista_amigos:
+            print(f"Grado: {grado}, Nombre: {amigo}, con la siguiente lista de hobbies: {lista}")
     else:
         print("No se encontraron amigos con los mismos intereses")
 

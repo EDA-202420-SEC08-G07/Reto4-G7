@@ -278,23 +278,18 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
     cantidad = 0
     
     # Verificar y limpiar lista_hobbies_usuario
-    print("Original lista_hobbies_usuario:", lista_hobbies_usuario)
     if isinstance(lista_hobbies_usuario, str):
         lista_hobbies_usuario = [hobbie.strip().lower() for hobbie in lista_hobbies_usuario.split(",")]
     else:
         lista_hobbies_usuario = [hobbie.strip().lower() for hobbie in lista_hobbies_usuario]
-    print("Procesada lista_hobbies_usuario:", lista_hobbies_usuario)
 
     # Encontramos los amigos directos de A y la información de estos
     amigos_directos = obtener_amigos(catalog, usuario_a)
-    print("Amigos directos:", amigos_directos)
-    cantidad += len(amigos_directos)
     
     # Procesamos amigos directos
     for amigo in amigos_directos:
         informacion_amigo = graph.get_vertex_info(catalog, amigo)
         hobbies = informacion_amigo.get("HOBBIES", "Unknown")
-        print(f"Amigo directo: {amigo}, Hobbies: {hobbies}")
         
         if hobbies != "Unknown":
             hobbies = [hobby.strip().lower() for hobby in hobbies.split(",")]
@@ -308,16 +303,15 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
         
         if hobbies_comun:
             amigos_validos.append(("1", amigo, hobbies_comun))
+            cantidad+=1
 
     # Encontramos amigos implícitos
     for amigo in amigos_directos:
         friends = obtener_amigos(catalog, amigo)
-        print(f"Amigos de {amigo} (implícitos): {friends}")
         for friend in friends:
             if friend != usuario_a:  # Evitar incluir al usuario original
                 informacion_amigo = graph.get_vertex_info(catalog, friend)
                 hobbies = informacion_amigo.get("HOBBIES", "Unknown")
-                print(f"Amigo implícito: {friend}, Hobbies: {hobbies}")
                 
                 if hobbies != "Unknown":
                     hobbies = [hobby.strip().lower() for hobby in hobbies.split(",")]
@@ -331,8 +325,8 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
                 
                 if hobbies_comun:
                     amigos_validos.append(("2", friend, hobbies_comun))
+                    cantidad+=1
 
-    print("Amigos válidos encontrados:", amigos_validos)
     return cantidad, amigos_validos
 
 def req_8(catalog):
