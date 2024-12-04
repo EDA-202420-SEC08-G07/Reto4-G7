@@ -11,6 +11,8 @@ from DataStructures.Map import map_linear_probing as mp_lin
 from DataStructures.List import array_list as lt
 from DataStructures.Graph import dfs as dfs
 from DataStructures.Graph import bfs as bfs
+from DataStructures.Tree import binary_search_tree as bst
+from DataStructures.Tree import red_black_tree as rbt
 
 sys.setrecursionlimit(10000)
 
@@ -272,11 +274,7 @@ def req_6(catalog, N):
     Retorna los N usuarios más populares y un árbol que los conecta.
     """
     usuarios_populares = []
-    
-    # Paso 1: Obtener todos los vértices (usuarios)
     vertices = mp_lin.key_set(catalog["vertices"])["elements"]
-    
-    # Recolectar la información de cada vértice
     for vertice in vertices:
         seguidores = graph.degree(catalog, vertice)
         if seguidores is not None and seguidores > 0:
@@ -287,35 +285,24 @@ def req_6(catalog, N):
                 "alias": alias,
                 "seguidores": seguidores
             })
-    
-    # Paso 2: Ordenar por número de seguidores en orden descendente
     usuarios_populares = merge_sort(usuarios_populares, "seguidores")
     
-    # Paso 3: Seleccionar los N usuarios más populares
     top_users = usuarios_populares[:N]
-    
-    # Paso 4: Crear un árbol de conexión entre los N usuarios más populares usando DFS
-    visited = set()  # Para verificar qué usuarios ya fueron visitados
-    tree = []  # Para almacenar las conexiones del árbol
-    
-    # DFS desde el primer usuario en top_users
-    def dfs(u):
-        visited.add(u)
-        adj_list = mp_lin.get(catalog["vertices"], u)
-        if adj_list and "elements" in adj_list:
-            for v in adj_list["elements"]:
-                v_id = v['vertex']
-                if v_id not in visited and v_id in [user["id"] for user in top_users]:
-                    tree.append((u, v_id))
-                    dfs(v_id)
-    
-    # Comenzar DFS desde el primer usuario más popular
-    dfs(top_users[0]["id"])
-    
-    return top_users, tree
 
+    Ids_populares = [user["id"] for user in top_users]
 
-
+    Ids_arbol = set()
+    usuario_mas_popular = Ids_populares[0]
+    Ids_arbol.add(usuario_mas_popular)
+    for w in range(1, len(Ids_populares)):
+        camino = bfs.bfs_camino(catalog, usuario_mas_popular, Ids_populares[w])
+        if camino:
+            Ids_arbol.update(camino)
+    arbol = rbt.new_map()
+    for nodo in Ids_arbol:
+        rbt.put(arbol, nodo, nodo)
+    
+    return top_users, arbol
 
 
 def req_7(catalog, usuario_a, hobbies_buscar):

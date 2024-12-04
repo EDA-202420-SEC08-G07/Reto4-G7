@@ -528,3 +528,65 @@ def values_in_range(root, key_lo, key_hi, value_list):
         values_in_range(root['right'], key_lo, key_hi, value_list)
     return value_list
 
+def get_root(tree):
+    """
+    Obtiene la raíz del árbol.
+
+    Parameters:
+    tree (dict): Árbol binario representado como un diccionario.
+
+    Returns:
+    str: ID de la raíz del árbol o None si no hay raíz.
+    """
+    return tree.get("root", None)
+
+
+def get_key(tree, node_id):
+    """
+    Obtiene el valor clave del nodo.
+
+    Parameters:
+    tree (dict): Árbol binario representado como un diccionario.
+    node_id: ID del nodo cuyo valor clave se quiere obtener.
+
+    Returns:
+    any: Valor clave almacenado en el nodo o None si no existe.
+    """
+    node = tree["nodes"].get(node_id, None)
+    if node:
+        return node.get("key", None)
+    return None
+
+
+def get_left(tree, node_id):
+    """
+    Obtiene el hijo izquierdo del nodo.
+
+    Parameters:
+    tree (dict): Árbol binario representado como un diccionario.
+    node_id: ID del nodo cuyo hijo izquierdo se quiere obtener.
+
+    Returns:
+    str: ID del hijo izquierdo o None si no existe.
+    """
+    node = tree["nodes"].get(node_id, None)
+    if node:
+        return node.get("left", None)
+    return None
+
+
+def get_right(tree, node_id):
+    """
+    Obtiene el hijo derecho del nodo.
+
+    Parameters:
+    tree (dict): Árbol binario representado como un diccionario.
+    node_id: ID del nodo cuyo hijo derecho se quiere obtener.
+
+    Returns:
+    str: ID del hijo derecho o None si no existe.
+    """
+    node = tree["nodes"].get(node_id, None)
+    if node:
+        return node.get("right", None)
+    return None
