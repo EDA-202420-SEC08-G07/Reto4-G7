@@ -275,21 +275,42 @@ def req_7(catalog, usuario_a, lista_hobbies_usuario):
     """
     amigos_validos=[]
     cantidad=0
+    amigos_visitados = set()
+    
     # Encontramos los amigos directos de A y la informacion de estos
     amigos_directos= obtener_amigos(catalog, usuario_a)
     cantidad+=len(amigos_directos)
+    
     for amigo in amigos_directos:
-        informacion_amigo=graph.get_vertex_info(catalog, amigo)
-        hobbies=informacion_amigo.get("HOBBIES", "Unknown")
-        hobbies_comun=[]
-        for hobbie in hobbies:
-            if hobbie in lista_hobbies_usuario:
-                hobbies_comun.append(hobbie)
-        amigos_validos.append(("1", hobbies_comun))
-                
+        if amigo not in amigos_visitados:
+            amigos_visitados.add(amigo)
+            informacion_amigo = graph.get_vertex_info(catalog, amigo)
+            hobbies = informacion_amigo.get("HOBBIES", [])
+            # Buscamos hobbies comunes
+            hobbies_comun = []
+            for hobbie in hobbies:
+                if hobbie in lista_hobbies_usuario:
+                    hobbies_comun.append(hobbie)
+            if hobbies_comun:
+                amigos_validos.append(("1", amigo, hobbies_comun))      
+
     # Encontramos amigos implicitos (A amigos B, B amigo C entonces A amigo C)
+    for amigo in amigos_directos:
+        amigos_implicitos = obtener_amigos(catalog, amigo)
+        for amigo_implicito in amigos_implicitos:
+            if amigo_implicito not in amigos_visitados:
+                amigos_visitados.add(amigo_implicito)
+                informacion_amigo = graph.get_vertex_info(catalog, amigo_implicito)
+                hobbies = informacion_amigo.get("HOBBIES", [])
+                hobbies_comun = []
+                for hobbie in hobbies:
+                    if hobbie in lista_hobbies_usuario:
+                        hobbies_comun.append(hobbie)
+                if hobbies_comun:
+                    amigos_validos.append(("2", amigo_implicito, hobbies_comun))
     
     
+    return amigos_validos
 
 def req_8(catalog):
     """
