@@ -489,20 +489,28 @@ def print_req_7(control):
         Función que imprime la solución del Requerimiento 7 en consola
     """
     usuario_a = input("Ingrese el ID del usuario: ")
-    lista_hobbies = input("Ingrese los hobbies de los cuales desea conocer la subred: ('tango', 'parapente'): ")
+    lista_hobbies = input("Ingrese los hobbies de los cuales desea conocer la subred: ")
+    print("--------------------------------------------------------------------------------------------------------------------------------------------")
     lista_hobbies = lista_hobbies.split(",")
     for i in range(len(lista_hobbies)):
         lista_hobbies[i] = lista_hobbies[i].strip()
     start_time = logic.get_time()
-    cantidad, lista_amigos=logic.req_7(control, usuario_a, lista_hobbies)
+    directos, indirectos, cantidad, lista_amigos=logic.req_7(control, usuario_a, lista_hobbies)
     end_time = logic.get_time()
     elapsed_time = logic.delta_time(start_time, end_time)
     print(f"El tiempo de ejecución fue: {elapsed_time} ms")
     if len(lista_amigos)!=0:
         print("El total de amigos con intereses en comun es de: ", cantidad)
+        print(f"Tiene un total de {directos} amigos directos y {indirectos} amigos indirectos")
         print("La subred de amigos encontrada es la siguiente: ")
-        for grado, amigo, lista in lista_amigos:
-            print(f"Grado: {grado}, id: {amigo}, con la siguiente lista de hobbies: {lista}")
+        print("--------------------------------------------------------------------------------------------------------------------------------------------")
+        for grado, amigo, lista, comun in lista_amigos:
+            if comun:
+                print(f"El usuario tiene una profundidad de: {grado}, id: {amigo}, y tiene la siguiente lista de hobbies: {lista} y tienen los siguientes hobbies con el usuario buscado: {comun}")
+                print("--------------------------------------------------------------------------------------------------------------------------------------------")
+            else:
+                print(f"El usuario tiene una profundidad de: {grado}, id: {amigo}, y tiene la siguiente lista de hobbies: {lista} pero no tienen ningun hobbie en comun con el usuario buscado")
+                print("--------------------------------------------------------------------------------------------------------------------------------------------")
     else:
         print("No se encontraron amigos con los mismos intereses")
 

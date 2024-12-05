@@ -484,20 +484,31 @@ def req_8(catalog, center_lat, center_lon, radius_km):
     vertices = graph.vertices(catalog)['elements']  # Obtener todos los nodos del grafo
     for user_id in vertices:
         user_info = graph.get_vertex_info(catalog, user_id)
-        if not user_info:
-            continue
+        if user_info:  
+            user_lat_raw = user_info.get("LATITUDE", "").strip()
+            user_lon_raw = user_info.get("LONGITUDE", "").strip()
 
-        user_lat = float(user_info.get("LATITUDE", 0))
-        user_lon = float(user_info.get("LONGITUDE", 0))
-        distance = haversine(center_lat, center_lon, user_lat, user_lon)
+            # Verificar si las coordenadas no están vacías y son válidas
+            if user_lat_raw and user_lon_raw:
+                try:
+                    user_lat = float(user_lat_raw)
+                    user_lon = float(user_lon_raw)
+                except ValueError:
+                    user_lat = None
+                    user_lon = None
 
-        # Si el usuario está dentro del radio, agregarlo al mapa
-        if distance <= radius_km:
-            folium.Marker(
-                location=[user_lat, user_lon],
-                popup=f"ID: {user_id}\nName: {user_info.get('USER_NAME', 'Unknown')}",
-                icon=folium.Icon(color="blue", icon="user")
-            ).add_to(mapa)
+                if user_lat is not None and user_lon is not None:
+                    # Calcular la distancia con Haversine
+                    distance = haversine(center_lat, center_lon, user_lat, user_lon)
+
+                    # Si el usuario está dentro del radio, agregarlo al mapa
+                    if distance <= radius_km:
+                        folium.Marker(
+                            location=[user_lat, user_lon],
+                            popup=f"ID: {user_id}\nName: {user_info.get('USER_NAME', 'Unknown')}",
+                            icon=folium.Icon(color="blue", icon="user")
+                        ).add_to(mapa)
+
     end_time = get_time()
     tiempo_ejecucion = delta_time(start_time, end_time)
 
