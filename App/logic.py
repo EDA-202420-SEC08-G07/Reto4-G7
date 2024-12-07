@@ -259,7 +259,7 @@ def req_4(catalog, user_id_a, user_id_b):
     # Guardamos la informacion de los seguidos en comun
     amigos_comun = []
     for usuario in interseccion:
-        usuario_data = mp_lin.get(catalog["datos_usuarios"], usuario)
+        usuario_data = graph.get_vertex_info(catalog, usuario)
         if usuario_data:
             id_usuario = usuario
             alias = usuario_data.get("USER_NAME", "Desconocido")
